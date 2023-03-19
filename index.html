@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ドット絵をMFMにするやつ</title>
+  <style>
+    #canvas {
+      position: absolute;
+    }
+    #wrp {
+      width:  512px;
+      height:  512px;
+      border: 1px solid black;
+    }
+    #grid {
+      pointer-events: none;
+      z-index: 1;
+      background: transparent;
+      position: absolute;
+    }
+  </style>
+</head>
+<body>
+  <h1>ドット絵をMFMにするやつ</h1>
+  <div id="wrp">
+    <canvas id="grid" width="512" height="512"></canvas>
+    <canvas id="canvas" width="512" height="512"></canvas>
+  </div>
+  <div style="display: flex; flex-direction: row;">
+    <input type="color" id="colorPicker"><br><br>
+    <button onclick="savePixels()">保存</button>
+  </div>
+  <br><br>
+  <script>
+    var canvas = document.getElementById("canvas");
+    var ctx = canvas.getContext("2d");
+    var isPainting = false;
+
+    const wh = 8
+    const size = 512 / wh
+
+    {
+      const grid = document.getElementById("grid");
+      const ctx = grid.getContext("2d")
+      for (let x = 0; x < wh; x++){
+        ctx.beginPath()
+        ctx.strokeStyle = "red"
+        ctx.moveTo(x * size, 0)
+        ctx.lineTo(x * size, 512)
+        ctx.stroke()
+        ctx.closePath()
+      }
+      for (let y = 0; y < wh; y++){
+        ctx.beginPath()
+        ctx.strokeStyle = "blue"
+        ctx.moveTo(0, y * size)
+        ctx.lineTo(512, y * size)
+        ctx.stroke()
+        ctx.closePath()
+      }
+      ctx.beginPath()
+      ctx.strokeStyle = "#0f0"
+      ctx.moveTo(512 / 2, 0)
+      ctx.lineTo(512 / 2, 512)
+      ctx.stroke()
+      ctx.closePath()
+      ctx.beginPath()
+      ctx.strokeStyle = "#0f0"
+      ctx.moveTo(0, 512 / 2)
+      ctx.lineTo(512, 512 / 2)
+      ctx.stroke()
+      ctx.closePath()
+    }
+
+    ctx.fillStyle = "#fff"
+    ctx.fillRect(0, 0, 512, 512);
+
+    canvas.addEventListener("mousedown", function(e) {
+      isPainting = true;
+      paint(e);
+    });
+
+    canvas.addEventListener("mousemove", function(e) {
+      if (isPainting) {
+        paint(e);
+      }
+    });
+
+    canvas.addEventListener("mouseup", function() {
+      isPainting = false;
+    });
+
+    function paint(e) {
+      var x = e.pageX - canvas.offsetLeft;
+      var y = e.pageY - canvas.offsetTop;
+      ctx.fillStyle = document.getElementById("colorPicker").value;
+      ctx.fillRect(Math.floor(x / size) * size, Math.floor(y / size) * size, size, size);
+    }
+
+    const round = n => Math.min(255, Math.round(n))
+    const sum = a => round(a.reduce((p, c) => p + c, 0) / a.length)
+
+    function savePixels() {
+      var pixels = "$[font.monospace ";
+      for (var i = 0; i < wh; i ++) {
+        for (var j = 0; j < wh; j ++) {
+          var pixelData = ctx.getImageData(j * size + 2, i * size + 2, 1, 1).data;
+          var hexColor = (rgbToHex(
+            pixelData[0],
+            pixelData[1],
+            pixelData[2]
+          ))
+          pixels += "$[bg.color=" + hexColor + " :blank:]";
+        }
+        pixels += "\n";
+      }
+      pixels += "]"
+      save(pixels);
+    }
+
+    function rgbToHex(r, g, b) {
+      return ((r << 16) | (g << 8) | b).toString(16).padStart(6, "0").replace(/^([0-9a-f])\1([0-9a-f])\2([0-9a-f])\3$/, "$1$2$3");
+    }
+
+    function save(text) {
+      navigator.clipboard.writeText(text)
+      alert("クリップボードへ保存できました。");
+    }
+  </script>
+</body>
+</html>
