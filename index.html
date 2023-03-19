@@ -18,18 +18,20 @@
       position: absolute;
     }
   </style>
+  <link rel="stylesheet" href="https://ikasoba.github.io/proto-css/src/proto.css" />
 </head>
 <body>
-  <h1>ドット絵をMFMにするやつ</h1>
-  <div id="wrp">
-    <canvas id="grid" width="512" height="512"></canvas>
-    <canvas id="canvas" width="512" height="512"></canvas>
-  </div>
-  <div style="display: flex; flex-direction: row;">
-    <input type="color" id="colorPicker"><br><br>
-    <button onclick="savePixels()">保存</button>
-  </div>
-  <br><br>
+  <main p-center p-flex-col>
+    <h1>ドット絵をMFMにするやつ</h1>
+    <div id="wrp">
+      <canvas id="grid" width="512" height="512"></canvas>
+      <canvas id="canvas" width="512" height="512"></canvas>
+    </div>
+    <div p-flex-row>
+      <input type="color" id="colorPicker"><br><br>
+      <button onclick="savePixels()">保存</button>
+    </div>
+  </main>
   <script>
     var canvas = document.getElementById("canvas");
     var ctx = canvas.getContext("2d");
